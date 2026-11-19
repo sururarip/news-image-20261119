@@ -27,7 +27,9 @@ SRC = HERE / "entry.png"
 DST = OUT / "entry.png"
 
 shutil.copyfile(SRC, DST)
-assert DST.stat().st_size == SRC.stat().st_size
-assert hashlib.sha256(DST.read_bytes()).hexdigest() == hashlib.sha256(
-    SRC.read_bytes()
-).hexdigest()
+src_bytes = SRC.read_bytes()
+dst_bytes = DST.read_bytes()
+assert len(dst_bytes) == len(src_bytes), "copy truncated: size mismatch"
+digest = hashlib.sha256(dst_bytes).hexdigest()
+assert digest == hashlib.sha256(src_bytes).hexdigest(), "copy corrupt: sha256 mismatch"
+print(f"entry.png -> {DST} ({len(dst_bytes)} bytes, sha256 {digest[:16]}...)")
